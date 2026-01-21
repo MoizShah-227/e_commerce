@@ -1,8 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/entities/product.entity';
 import { Repository } from 'typeorm';
-import { AddProductDto } from './dto';
+import { AddProductDto, EditProductDto } from './dto';
 
 @Injectable()
 export class ProductService {
@@ -26,8 +26,8 @@ export class ProductService {
             throw new ForbiddenException(error)
         }
     }
+
     async addProduct(userData:any,dto:AddProductDto){
-        console.log(userData.role)
         if(userData.role!=="ADMIN") throw new ForbiddenException("Only Admin can add Product")
             try{
                 const res = await this.productRepo.save(dto)
@@ -37,7 +37,20 @@ export class ProductService {
             }
     }
         
-    async updateProduct(){}
+    async updateProduct(userData:any ,productId: number,dto:EditProductDto){
+        if(userData.role!=="ADMIN") throw new ForbiddenException("Only Admin can edit Product")
+        try{
+            const res = await this.productRepo.update({id:productId},dto);
+            if (res.affected===0) {
+                    throw new NotFoundException(`Product not found`);
+            }
+            return res
+        }
+            catch(error){
+                throw error;
+        }
+    }
+
     
     async deleteProduct(){}
 }

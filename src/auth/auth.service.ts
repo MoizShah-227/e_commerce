@@ -6,6 +6,7 @@ import * as argon from 'argon2'
 import { User } from 'src/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { loginDto, RegisterDto } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -15,7 +16,7 @@ export class AuthService {
     @InjectRepository(User)
     private userRepo: Repository<User>,) {}
     
-    async register(dto){
+    async register(dto:RegisterDto){
         const hash = await argon.hash(dto.password);
         try{   
             const res = await this.userRepo.save({
@@ -31,7 +32,7 @@ export class AuthService {
         }
     }
 
-    async login(dto){
+    async login(dto:loginDto){
         try{
             const user= await this.userRepo.findOneBy({email:dto.email})
             if(!user) throw new ForbiddenException("Invalid Credentials")

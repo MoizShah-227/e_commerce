@@ -1,9 +1,9 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, UnsupportedMediaTypeException, UseGuards } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { JwtGuard } from 'src/auth/guard';
 import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/auth/decorator';
-import { AddProductDto } from './dto';
+import { AddProductDto, EditProductDto } from './dto';
 
 @ApiTags('Products')
 @ApiBearerAuth()
@@ -30,7 +30,10 @@ export class ProductController {
     }
     
     @Patch("/update-product/:id")
-    updateProduct(){}
+    updateProduct(@GetUser() userData:any,@Param('id',ParseIntPipe) productId:number,@Body() dto:EditProductDto){
+        return this.productService.updateProduct(userData,productId,dto)
+
+    }
 
     @Patch("/delete-product/:id")
     deleteProduct(){}
