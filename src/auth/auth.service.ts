@@ -1,36 +1,62 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { user } from 'src/entities/user.enitity';
+// import { user } from 'srentities/cart.entity';
 import { Repository } from 'typeorm';
 import * as argon from 'argon2'
+import { User } from 'src/entities/user.entity';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
     constructor(
-    @InjectRepository(user)
-    private readonly userRepo: Repository<user>,
-  ) {}
+    private jwt:JwtService,
+    private config: ConfigService,
+    @InjectRepository(User)
+    private userRepo: Repository<User>,) {}
+    
     async register(dto){
         const hash = await argon.hash(dto.password);
-        console.log(hash);
-        try{            
-            const res = await this.userRepo.create({
+        try{   
+            const res = await this.userRepo.save({
                 name:dto.name,
                 email:dto.email,
-                password:hash,
-            })
-            return res;
+                Hash:hash,
+            })                     
+            return this.signToken(res.id,res.email);
         }catch(error){
-            throw new ForbiddenException(error)
+            if(error.code === "23505"){
+                throw new ForbiddenException("Credentials taken")
+            }
         }
     }
 
     async login(dto){
         try{
-            const user = this.userRepo.findOneBy({email:dto.email})
+            const user= await this.userRepo.findOneBy({email:dto.email})
             if(!user) throw new ForbiddenException("Invalid Credentials")
+            const pwmatch = await argon.verify(user.Hash,dto.password)
+            if(!pwmatch) throw new ForbiddenException("Invalid Password")
             
-            const pwmatch = await argon.verify(user.password,dto.password)
+            return this.signToken(user.id,user.email);
+        }catch(error){
+
         }
+    }
+
+
+     async signToken(userId:number,email:string):Promise<{access_token:string}>{
+        const payload ={
+            sub:userId,
+            email
+        }
+        const secret =this.config.get('JWT_KEY')
+        const token =  await this.jwt.signAsync(payload,{
+            expiresIn:'1h',
+            secret:secret,
+        });
+
+        return {access_token:"Bearer "+token,}
+
     }
 }
