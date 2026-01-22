@@ -36,6 +36,8 @@ export class ProductController {
     }
 
     @Patch("/delete-product/:id")
-    deleteProduct(){}
+    deleteProduct(@GetUser() userData:any,@Param('id',ParseIntPipe) productId:number){
+        return this.productService.deleteProduct(userData,productId)
+    }
 
 }

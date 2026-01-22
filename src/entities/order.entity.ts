@@ -1,6 +1,13 @@
-// order.entity.ts
-import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, ManyToMany, JoinTable } from 'typeorm';
 import { User } from './user.entity';
+import { Product } from './product.entity';
+
+
+export enum OrderStatus {
+  Pending = 'PENDING',
+  confirm = 'CONFIRMED',
+  cancle = 'CANCELLED',
+}
 
 @Entity()
 export class Order {
@@ -10,12 +17,18 @@ export class Order {
   @ManyToOne(() => User, user => user.orders, { onDelete: 'CASCADE' })
   user: User;
 
-  @Column({ type: 'jsonb' })
-  items: any[];
+  @ManyToMany(() => Product)
+  @JoinTable()
+  products: Product[];
 
   @Column('decimal')
   totalAmount: number;
 
-  @Column()
-  status: string;
+  @Column({
+      type: 'enum',
+      enum: OrderStatus,
+      default: OrderStatus.Pending,
+    })
+  status: OrderStatus;
 }
+
