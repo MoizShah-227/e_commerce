@@ -14,13 +14,13 @@ import { dot } from 'node:test/reporters';
 export class OrderController {
 
     constructor(private readonly orderService: OrderService){}
-    @Post('/place-order')
+    @Post('/order')
 
     placeOrder(@GetUser() user:any){
         return this.orderService.placeOrder(user)
     }
     
-    @Get('/getAllOrders')
+    @Get('/admin/orders')
     getAllOrders(@GetUser() userData:any){
         return this.orderService.getAllOrders(userData)
     }
@@ -30,10 +30,9 @@ export class OrderController {
         return this.orderService.getOrderStatus(userData,status)
     }
 
-    @Patch('/update-order-status/:id')
+    @Patch('/admin/orders/:id/status')
     updateOrderStatus(@GetUser() userData:any,@Param('id',ParseIntPipe) orderId:number,@Body() dto:OrderStatusDto){
         return this.orderService.updateOrderStatus(userData,orderId,dto)
-
     }
 
 }

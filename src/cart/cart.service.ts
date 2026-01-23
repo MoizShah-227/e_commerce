@@ -35,8 +35,6 @@ export class CartService {
             if(checkItem){
                 if(quantity>checkItem.quantity){
                     checkItem.quantity=checkItem.quantity+quantity
-                }else{
-                    checkItem.quantity=checkItem.quantity-quantity
                 }
             }else{
                 cart.items.push({ProductId,quantity})
@@ -50,14 +48,13 @@ export class CartService {
     }
 
 
-    async RemoveFromCart(user:any,dto:RemoveFromCartDto){
+    async RemoveFromCart(user:any,productId:number){
         if(user.role!=="USER") throw new ForbiddenException("Only User Can Remove Form Cart")
-        
         try{
             const cart = await this.cartRepo.findOne({where:{user:{id:user.id},status:CartStatus.ACTIVE}})
             if(!cart) throw new NotFoundException("Cart not Found")
 
-            const filtercart = cart?.items.filter((item)=>item.ProductId!==dto.ProductId)
+            const filtercart = cart?.items.filter((item)=>item.ProductId!=productId)
             if(filtercart.length===0){
                 cart.status=CartStatus.INACTIVE
             }
@@ -67,7 +64,6 @@ export class CartService {
         }catch(error){
             throw error;
         }
-        
     }
 
     async viewCart(user:any){
@@ -86,7 +82,7 @@ export class CartService {
         if(cart===null) throw new NotFoundException("Cart not found")
 
         for(const item of cart.items){
-            const product = await this.productRepo.findOne({where:{id:item.Productid,isActive:true}})
+            const product = await this.productRepo.findOne({where:{id:item.ProductId,isActive:true}})
             
             if(!product) throw new NotFoundException("Product Not Found")
         
