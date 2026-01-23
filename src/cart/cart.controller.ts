@@ -1,4 +1,4 @@
-import { Body, Controller, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/auth/guard';
 import { CartService } from './cart.service';
@@ -12,13 +12,18 @@ import { AddToCartDto, RemoveFromCartDto } from './dto';
 export class CartController {
     constructor(private readonly cartService: CartService){}
      @Post('/addToCart')
-        addToCart(@GetUser() user:any,@Body() dto:AddToCartDto){
-            return this.cartService.addToCart(user,dto)
-        }
+    addToCart(@GetUser() user:any,@Body() dto:AddToCartDto){
+        return this.cartService.addToCart(user,dto)
+    }
         
      @Patch('/removeFromCart')
-        RemoveFromCart(@GetUser() user:any,@Body() dto:RemoveFromCartDto){
-            return this.cartService.RemoveFromCart(user,dto)
-        }
+    RemoveFromCart(@GetUser() user:any,@Body() dto:RemoveFromCartDto){
+        return this.cartService.RemoveFromCart(user,dto)
+    }
+    @Get("/viewCart")
+    viewCart(@GetUser() user:any){
+        return this.cartService.viewCart(user)
+    }
+
 
 }

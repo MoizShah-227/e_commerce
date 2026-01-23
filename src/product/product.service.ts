@@ -80,9 +80,7 @@ export class ProductService {
     }
 
     async searchProduct(name:string){
-        console.log(name)
         try{
-
             const product = await this.productRepo.find({where:{
                 name:ILike(`%${name}%`),
                 isActive:true}

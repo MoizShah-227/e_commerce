@@ -2,9 +2,9 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cart, CartStatus } from 'src/entities/cart.entity';
 import { Product } from 'src/entities/product.entity';
-import { Repository } from 'typeorm';
+import { Repository, TreeParent } from 'typeorm';
 import { AddToCartDto, RemoveFromCartDto } from './dto';
-import { QueueAction } from 'rxjs/internal/scheduler/QueueAction';
+import { Decimal128 } from 'typeorm/browser';
 
 @Injectable()
 export class CartService {
@@ -68,5 +68,38 @@ export class CartService {
             throw error;
         }
         
+    }
+
+    async viewCart(user:any){
+        type product = {
+                productId: number,
+                name: string,
+                price: number,
+                quantity: number,
+                total: number,
+            };
+        if(user.role!=="USER") throw new ForbiddenException("Only User Can View Form Cart");
+
+        const cart = await this.cartRepo.findOne({where:{user:{id:user.id},status:CartStatus.ACTIVE}})
+
+        let productList:product[]=[]
+        if(cart===null) throw new NotFoundException("Cart not found")
+
+        for(const item of cart.items){
+            const product = await this.productRepo.findOne({where:{id:item.Productid,isActive:true}})
+            
+            if(!product) throw new NotFoundException("Product Not Found")
+        
+            productList.push({
+            productId: product.id,
+            name: product.name,
+            price: product.price, 
+            quantity: item.quantity,
+            total: Number(product.price) * item.quantity,
+            });
+        }
+        
+
+        return productList;
     }
 }
