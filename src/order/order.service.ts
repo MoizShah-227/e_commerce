@@ -1,5 +1,5 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { OrderStatusDto, PlaceOrderDto } from './dto';
+import { OrderStatus, OrderStatusDto, PlaceOrderDto } from './dto';
 import { Product } from 'src/entities/product.entity';
 import {  Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -70,8 +70,15 @@ export class OrderService {
     }
 }
     
-    async getOrderHistory(){
-        return "placeorder2"
+    async getOrderStatus(user:any,status:OrderStatus){
+        if(user.role!=="USER") throw new ForbiddenException("Only USER can Get")
+        try{
+            const order = await this.orderRepo.find({ where: { user: { id: user.id },status:status}});
+            if(!order) return {message:`There is no ${status} order`}
+            return order;
+        }catch(error){
+            throw error;
+        }
     }
 
     async updateOrderStatus(userData:any,orderId:number,dto:OrderStatusDto){

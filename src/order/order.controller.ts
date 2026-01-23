@@ -4,6 +4,7 @@ import { GetUser } from 'src/auth/decorator';
 import { OrderStatus, OrderStatusDto, PlaceOrderDto } from './dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/auth/guard';
+import { dot } from 'node:test/reporters';
 
 @Controller('order')
 @ApiTags('Order')
@@ -24,10 +25,9 @@ export class OrderController {
         return this.orderService.getAllOrders(userData)
     }
 
-    @Get('/order-history')
-    getOrderHistory(){
-        return this.orderService.getOrderHistory()
-
+    @Get('/order-status/:status')
+    getOrderStatus(@GetUser() userData:any,@Param('status') status:OrderStatus){
+        return this.orderService.getOrderStatus(userData,status)
     }
 
     @Patch('/update-order-status/:id')
