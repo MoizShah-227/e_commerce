@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Cart, CartStatus } from 'src/entities/cart.entity';
 import { Product } from 'src/entities/product.entity';
 import { Repository } from 'typeorm';
-import { AddToCartDto } from './dto';
+import { AddToCartDto, RemoveFromCartDto } from './dto';
 import { QueueAction } from 'rxjs/internal/scheduler/QueueAction';
 
 @Injectable()
@@ -47,5 +47,26 @@ export class CartService {
         catch(error){
             throw error
         }
+    }
+
+
+    async RemoveFromCart(user:any,dto:RemoveFromCartDto){
+        if(user.role!=="USER") throw new ForbiddenException("Only User Can Remove Form Cart")
+        
+        try{
+            const cart = await this.cartRepo.findOne({where:{user:{id:user.id},status:CartStatus.ACTIVE}})
+            if(!cart) throw new NotFoundException("Cart not Found")
+
+            const filtercart = cart?.items.filter((item)=>item.ProductId!==dto.ProductId)
+            if(filtercart.length===0){
+                cart.status=CartStatus.INACTIVE
+            }
+            cart.items=filtercart
+            await this.cartRepo.save(cart)
+            return {message:"Item Remove from cart"}
+        }catch(error){
+            throw error;
+        }
+        
     }
 }

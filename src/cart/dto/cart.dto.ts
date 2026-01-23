@@ -12,3 +12,10 @@ export class AddToCartDto{
         @IsNumber()
         quantity:number    
 }
+export class RemoveFromCartDto{
+        @ApiProperty({example:1})
+        @IsNumber()
+        @IsNotEmpty()
+        ProductId:number    
+}
+
