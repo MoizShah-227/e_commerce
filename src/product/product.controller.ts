@@ -44,7 +44,6 @@ export class ProductController {
     }
 
     @Get("/search-product/:name")
-    
     searchProduct(@Param('name') name:string){
         return this.productService.searchProduct(name);
     }

@@ -93,11 +93,22 @@ export class OrderService {
         }
     }
 
+    async getOrderById(orderId:number){
+        try{
+            const orderInfo = await this.orderRepo.find({where:{id:orderId}})
+            if(!orderInfo) throw new NotFoundException("Order Not Found")
+            return orderInfo
+        }catch(error){
+            throw error;
+        }
+    }
+
     calculateTotal(items: { product: any; quantity: number }[]) {
     const total = items.reduce((sum, item) => {
         return sum + Number(item.product.price) * item.quantity;
     }, 0);
     return total;
     }
+
 
 }

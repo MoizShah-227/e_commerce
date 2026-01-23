@@ -35,4 +35,9 @@ export class OrderController {
         return this.orderService.updateOrderStatus(userData,orderId,dto)
     }
 
+    @Get("/orders/:id")
+    // @ApiParam({ name: 'id', type: Number })
+    getOrderById(@Param('id',ParseIntPipe) productId:number){
+        return this.orderService.getOrderById(productId)
+    }    
 }
