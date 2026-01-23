@@ -43,7 +43,10 @@ export class ProductController {
         return this.productService.deleteProduct(userData,productId)
     }
 
-    // @get("/search-product/:name")
+    @Get("/search-product/:name")
     
+    searchProduct(@Param('name') name:string){
+        return this.productService.searchProduct(name);
+    }
 
 }

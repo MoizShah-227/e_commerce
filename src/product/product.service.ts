@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/entities/product.entity';
-import { Repository } from 'typeorm';
+import { ILike, Like, Repository } from 'typeorm';
 import { AddProductDto, EditProductDto } from './dto';
 
 
@@ -78,4 +78,21 @@ export class ProductService {
         }
 
     }
+
+    async searchProduct(name:string){
+        console.log(name)
+        try{
+
+            const product = await this.productRepo.find({where:{
+                name:ILike(`%${name}%`),
+                isActive:true}
+            })
+
+            if(product.length===0) throw new NotFoundException("Product not Found")
+            return product
+        }catch(error){
+            throw error;
+        }
+    }
+
 }
