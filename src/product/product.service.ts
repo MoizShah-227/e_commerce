@@ -3,20 +3,30 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/entities/product.entity';
 import { Repository } from 'typeorm';
 import { AddProductDto, EditProductDto } from './dto';
-import { error } from 'console';
+
 
 @Injectable()
 export class ProductService {
     constructor(@InjectRepository(Product) private productRepo:Repository<Product>){}
-    async getProduct(){
-        try{
-            const product = await this.productRepo.find({where:{isActive:true}});
-            if(!product) throw new ForbiddenException("There no product")
-            return product;
-        }catch(error){
-            throw new ForbiddenException(error)
+    async getProduct(page:number, limit:number) {
+        try {
+            const [products, total] = await this.productRepo.findAndCount({
+            where: { isActive: true },
+            take: limit, 
+            skip: (page - 1) * limit,
+            });
+
+            return {
+            data: products,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
+            };
+        } catch (error) {
+            throw new ForbiddenException(error.message || 'Failed to fetch products');
         }
     }
+
     
     async getProductById(productId:number){
         try{

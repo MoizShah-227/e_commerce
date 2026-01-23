@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, UnsupportedMediaTypeException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, UnsupportedMediaTypeException, UseGuards } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { JwtGuard } from 'src/auth/guard';
-import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/auth/decorator';
 import { AddProductDto, EditProductDto } from './dto';
 
@@ -13,9 +13,12 @@ import { AddProductDto, EditProductDto } from './dto';
 export class ProductController {
     constructor(private productService:ProductService){}
 
+    @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+    @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+    
     @Get("/get-products")
-    getProduct(){
-        return this.productService.getProduct()
+    getProduct( @Query('page') page,@Query('limit') limit){
+    return this.productService.getProduct(Number(page), Number(limit));
     }
     
     @Get("/get-product/:id")
@@ -39,5 +42,8 @@ export class ProductController {
     deleteProduct(@GetUser() userData:any,@Param('id',ParseIntPipe) productId:number){
         return this.productService.deleteProduct(userData,productId)
     }
+
+    // @get("/search-product/:name")
+    
 
 }
