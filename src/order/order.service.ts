@@ -1,10 +1,11 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { OrderStatusDto, PlaceOrderDto } from './dto';
 import { Product } from 'src/entities/product.entity';
 import {  Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from 'src/entities/order.entity';
 import { Cart, CartStatus } from 'src/entities/cart.entity';
+import { ProductController } from 'src/product/product.controller';
 
 @Injectable()
 export class OrderService {
@@ -12,24 +13,51 @@ export class OrderService {
         @InjectRepository(Order) private orderRepo:Repository<Order>,
         @InjectRepository(Cart) private cartRepo:Repository<Cart>){}
     
-    async placeOrder(user:any,dto:PlaceOrderDto){
+    async placeOrder(user:any){
         if(user.role!=="USER") throw new ForbiddenException("only User can place order") 
         const cart = await this.cartRepo.findOne({where:{user:{id:user.id},status:CartStatus.ACTIVE}})
-        return cart;
+
+        if(!cart) throw new NotFoundException("Cart not Found")
+        type OrderItem = {
+            product: Product;
+            quantity: number;
+        };
+
+        const orderItems: OrderItem[] = [];
         
-        // const products = await this.productRepo.find({where:{id:In(dto.products)}})
-        // const totalAmount=await this.calulateTotal(products)
-        // try{
-        //       const order = this.orderRepo.create({
-        //         user: { id: user.id },      
-        //         products: products,      
-        //         totalAmount,
-        //     });
-        //     const res = await this.orderRepo.save(order)
-        //     return res;
-        // }catch(error){
-        //     throw error;
-        // }
+        for(const item of cart.items){
+            const product = await this.productRepo.findOne({where:{ id: item?.ProductId,isActive:true}})
+
+            if (product?.stockQuantity === undefined) {
+                 throw new BadRequestException(`Product stock info is missing`);
+            }
+            
+            if(item.quantity>product.stockQuantity){
+                throw new ForbiddenException(`product has only ${product?.stockQuantity} in stocks`)
+            }
+             orderItems.push({ product, quantity: item.quantity });
+            
+            //reducing the stock and save this
+            product.stockQuantity-=item.quantity
+            await this.productRepo.save(product)            
+        }
+
+            //calulate the total
+            const totalAmount = await this.calculateTotal(orderItems)
+            console.log(totalAmount)
+
+            //save data to the order
+            const order = this.orderRepo.create({
+                user:{id:user.id},
+                items:orderItems,
+                totalAmount:totalAmount
+            })
+            await this.orderRepo.save(order)
+
+            //clear the cart and change the status 
+            cart.items=[]
+            cart.status=CartStatus.INACTIVE
+            await this.cartRepo.save(cart)
     }
         
     async getAllOrders(userData:any){
@@ -51,15 +79,18 @@ export class OrderService {
         try{
                 const res = await this.orderRepo.update({id:orderId},{status:dto.status})
                 if(res.affected===0) throw new NotFoundException("Order not Found") 
-                    return res;
+                return res;
         }
         catch(error){
             throw error;
         }
     }
 
-    calulateTotal(products:any){
-        const total = products.reduce((sum, product:any) => sum + parseInt(product.price), 0);
-        return total;
+    calculateTotal(items: { product: any; quantity: number }[]) {
+    const total = items.reduce((sum, item) => {
+        return sum + Number(item.product.price) * item.quantity;
+    }, 0);
+    return total;
     }
+
 }

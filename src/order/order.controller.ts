@@ -15,8 +15,8 @@ export class OrderController {
     constructor(private readonly orderService: OrderService){}
     @Post('/place-order')
 
-    placeOrder(@GetUser() user:any,@Body() dto:PlaceOrderDto){
-        return this.orderService.placeOrder(user,dto)
+    placeOrder(@GetUser() user:any){
+        return this.orderService.placeOrder(user)
     }
     
     @Get('/getAllOrders')

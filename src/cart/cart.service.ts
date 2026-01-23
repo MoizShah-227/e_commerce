@@ -13,7 +13,6 @@ export class CartService {
         
         async addToCart(user:any,dto:AddToCartDto){
         if(user.role!=="USER") throw new ForbiddenException("only User can AddToCart") 
-        console.log(user)
             
           try{
             const {ProductId,quantity} =dto;
@@ -46,7 +45,7 @@ export class CartService {
             return res
           }
         catch(error){
-            throw new error
+            throw error
         }
     }
 }
