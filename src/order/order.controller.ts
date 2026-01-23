@@ -7,15 +7,14 @@ import { JwtGuard } from 'src/auth/guard';
 
 @Controller('order')
 @ApiTags('Order')
-
 @ApiBearerAuth()
-@Controller('product')
 @UseGuards(JwtGuard)
 
 export class OrderController {
 
     constructor(private readonly orderService: OrderService){}
     @Post('/place-order')
+
     placeOrder(@GetUser() user:any,@Body() dto:PlaceOrderDto){
         return this.orderService.placeOrder(user,dto)
     }

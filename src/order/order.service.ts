@@ -1,19 +1,21 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { OrderStatusDto, PlaceOrderDto } from './dto';
 import { Product } from 'src/entities/product.entity';
-import { In, Repository } from 'typeorm';
+import {  Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from 'src/entities/order.entity';
-import { promises } from 'dns';
-import { retryWhen } from 'rxjs';
+import { Cart, CartStatus } from 'src/entities/cart.entity';
 
 @Injectable()
 export class OrderService {
     constructor(@InjectRepository(Product) private productRepo:Repository<Product>,
-        @InjectRepository(Order) private orderRepo:Repository<Order>){}
+        @InjectRepository(Order) private orderRepo:Repository<Order>,
+        @InjectRepository(Cart) private cartRepo:Repository<Cart>){}
     
     async placeOrder(user:any,dto:PlaceOrderDto){
-        // if(user.role!=="USER") throw new ForbiddenException("only User can place order") 
+        if(user.role!=="USER") throw new ForbiddenException("only User can place order") 
+        const cart = await this.cartRepo.findOne({where:{user:{id:user.id},status:CartStatus.ACTIVE}})
+        return cart;
         
         // const products = await this.productRepo.find({where:{id:In(dto.products)}})
         // const totalAmount=await this.calulateTotal(products)

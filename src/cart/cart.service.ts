@@ -12,6 +12,9 @@ export class CartService {
         @InjectRepository(Cart) private cartRepo:Repository<Cart>){}
         
         async addToCart(user:any,dto:AddToCartDto){
+        if(user.role!=="USER") throw new ForbiddenException("only User can AddToCart") 
+        console.log(user)
+            
           try{
             const {ProductId,quantity} =dto;
             if(dto.quantity<=0) throw new ForbiddenException("Quantity must be greater than 0")
@@ -19,8 +22,7 @@ export class CartService {
             const product = await this.productRepo.findOneBy({id:ProductId})
             if(!product) throw new NotFoundException("Product Not Found")
 
-            let cart = await this.cartRepo.findOne({where:{user:user.id,status:CartStatus.ACTIVE}})
-
+            let cart = await this.cartRepo.findOne({where:{user:{id:user.id},status:CartStatus.ACTIVE}})
             if(quantity>product.stockQuantity) throw new ForbiddenException("Item is out of stock")
             if(!cart){
                 cart= this.cartRepo.create({
@@ -30,9 +32,13 @@ export class CartService {
                 });
             }
 
-            const checkItem = cart.items.find((item)=>{item.ProductId===ProductId})
+            const checkItem = cart.items.find((item)=>item.ProductId===ProductId)
             if(checkItem){
-                checkItem.quantity=checkItem.quantity+quantity
+                if(quantity>checkItem.quantity){
+                    checkItem.quantity=checkItem.quantity+quantity
+                }else{
+                    checkItem.quantity=checkItem.quantity-quantity
+                }
             }else{
                 cart.items.push({ProductId,quantity})
             }
