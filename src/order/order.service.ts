@@ -13,23 +13,21 @@ export class OrderService {
         @InjectRepository(Order) private orderRepo:Repository<Order>){}
     
     async placeOrder(user:any,dto:PlaceOrderDto){
-        console.log("user",user)
-        console.log("dto",dto)
-        if(user.role!=="USER") throw new ForbiddenException("only User can place order") 
+        // if(user.role!=="USER") throw new ForbiddenException("only User can place order") 
         
-        const products = await this.productRepo.find({where:{id:In(dto.products)}})
-        const totalAmount=await this.calulateTotal(products)
-        try{
-              const order = this.orderRepo.create({
-                user: { id: user.id },      
-                products: products,      
-                totalAmount,
-            });
-            const res = await this.orderRepo.save(order)
-            return res;
-        }catch(error){
-            throw error;
-        }
+        // const products = await this.productRepo.find({where:{id:In(dto.products)}})
+        // const totalAmount=await this.calulateTotal(products)
+        // try{
+        //       const order = this.orderRepo.create({
+        //         user: { id: user.id },      
+        //         products: products,      
+        //         totalAmount,
+        //     });
+        //     const res = await this.orderRepo.save(order)
+        //     return res;
+        // }catch(error){
+        //     throw error;
+        // }
     }
         
     async getAllOrders(userData:any){

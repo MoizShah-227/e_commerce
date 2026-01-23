@@ -1,5 +1,5 @@
 // cart.entity.ts
-import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, Column} from 'typeorm';
 import { User } from "./user.entity"
 
 export enum CartStatus {

@@ -17,9 +17,14 @@ export class Order {
   @ManyToOne(() => User, user => user.orders, { onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToMany(() => Product)
-  @JoinTable()
-  products: Product[];
+  @Column({ type: 'jsonb' })
+  items: {
+  productId: number;
+  name: string;
+  quantity: number;
+  priceAtTime: number;
+  }[];
+
 
   @Column('decimal')
   totalAmount: number;

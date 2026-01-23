@@ -7,10 +7,10 @@ import { JwtGuard } from 'src/auth/guard';
 
 @Controller('order')
 @ApiTags('Order')
+
 @ApiBearerAuth()
 @Controller('product')
 @UseGuards(JwtGuard)
-
 
 export class OrderController {
 

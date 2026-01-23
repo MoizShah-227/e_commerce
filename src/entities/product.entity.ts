@@ -1,6 +1,4 @@
-// product.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
-import { Order } from './order.entity';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
 export class Product {
@@ -24,7 +22,4 @@ export class Product {
 
   @Column({ default: true })
   isActive: boolean;
-
-  @ManyToMany(() => Order, order => order.products)
-  orders: Order[];
 }
