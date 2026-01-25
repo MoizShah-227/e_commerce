@@ -44,7 +44,6 @@ export class OrderService {
 
             //calulate the total
             const totalAmount = await this.calculateTotal(orderItems)
-            console.log(totalAmount)
 
             //save data to the order
             const order = this.orderRepo.create({

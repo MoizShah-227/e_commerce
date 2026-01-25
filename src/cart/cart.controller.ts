@@ -22,12 +22,15 @@ export class CartController {
     addToCart(@GetUser() user:any,@Body() dto:AddToCartDto){
         return this.cartService.addToCart(user,dto)
     }
+
+    @Patch("/items/:id")
+    updateCart(@GetUser() user:any,@Body() productQuantity){
         
+    }
      @Delete('/items/:productId')
     RemoveFromCart(@GetUser() user:any,@Param('productId') productId:number){
         return this.cartService.RemoveFromCart(user,productId)
     }
     
-
 
 }

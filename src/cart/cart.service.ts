@@ -98,4 +98,39 @@ export class CartService {
 
         return productList;
     }
+
+
+
+    async updateCart(user:any,productId:number,productQuantity:number){
+        if(user.role!=="USER") throw new ForbiddenException("Only User can user this");
+
+        if(productQuantity<0) throw new ForbiddenException("Quantity must be greater than 0");
+
+        try{
+            const cart= await this.cartRepo.findOne({where:{user:{id:user.id},status:CartStatus.ACTIVE}})
+        
+        if(!cart) throw new NotFoundException("cart Not found")
+
+        const cartItemIndex = cart.items.findIndex((item)=>productId===item.productId)
+
+        if(productQuantity===0){
+            cart.items.splice(cartItemIndex,1)
+            return await this.cartRepo.save(cart)
+        }
+
+        const product = await this.productRepo.findOne({where:{id:productId,isActive:true}})
+
+        if(!product) throw new NotFoundException("Product Not Found")
+        
+        if(productQuantity>product.stockQuantity){
+            throw new ForbiddenException(`only ${product.stockQuantity} is available`)
+        }
+
+        cart.items[cartItemIndex].quantity=productQuantity;
+        
+        return await this.cartRepo.save(cart)
+        }catch(error){
+            throw error;
+        }
+    }
 }

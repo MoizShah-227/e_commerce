@@ -37,11 +37,10 @@ export class AuthService {
             const user= await this.userRepo.findOneBy({email:dto.email})
             if(!user) throw new ForbiddenException("Invalid Credentials")
             const pwmatch = await argon.verify(user.Hash,dto.password)
-            if(!pwmatch) throw new ForbiddenException("Invalid Password")
-            
+            if(!pwmatch) throw new ForbiddenException("Invalid Password");
             return this.signToken(user.id,user.email);
         }catch(error){
-
+            throw error;
         }
     }
 
