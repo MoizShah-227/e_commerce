@@ -71,7 +71,8 @@ export class ProductService {
         try{
             if(product){
                 const res = await this.productRepo.update({id:productId},{isActive:!product.isActive})
-                return res;
+                const message = product.isActive?"Product Deleted":"Product Activate"
+                return message
             }
         }catch(error){
             throw new error

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, UnsupportedMediaTypeException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UnsupportedMediaTypeException, UseGuards } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { JwtGuard } from 'src/auth/guard';
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
@@ -38,7 +38,7 @@ export class ProductController {
 
     }
 
-    @Patch("/admin/delete-product/:id")
+    @Delete("/admin/delete-product/:id")
     deleteProduct(@GetUser() userData:any,@Param('id',ParseIntPipe) productId:number){
         return this.productService.deleteProduct(userData,productId)
     }
