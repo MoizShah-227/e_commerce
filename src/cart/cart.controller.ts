@@ -24,7 +24,7 @@ export class CartController {
     }
 
     @Patch("/items/:id")
-    updateCart(@GetUser() user:any,@Param('id') productId:number,@Body() productQuantity){
+    updateCart(@GetUser() user:any,@Param('id') productId:number,@Body() productQuantity:number){
         return this.cartService.updateCart(user,productId,productQuantity)
     }
      @Delete('/items/:productId')
