@@ -4,7 +4,6 @@ import { Cart, CartStatus } from 'src/entities/cart.entity';
 import { Product } from 'src/entities/product.entity';
 import { Repository, TreeParent } from 'typeorm';
 import { AddToCartDto, RemoveFromCartDto } from './dto';
-import { Decimal128 } from 'typeorm/browser';
 
 @Injectable()
 export class CartService {
@@ -101,7 +100,7 @@ export class CartService {
 
 
 
-    async updateCart(user:any,productId:number,productQuantity:number){
+        async updateCart(user:any,productId:number,productQuantity:number){
         if(user.role!=="USER") throw new ForbiddenException("Only User can user this");
 
         if(productQuantity<0) throw new ForbiddenException("Quantity must be greater than 0");
@@ -111,8 +110,9 @@ export class CartService {
         
         if(!cart) throw new NotFoundException("cart Not found")
 
+        console.log(cart.items)
         const cartItemIndex = cart.items.findIndex((item)=>productId===item.productId)
-
+        console.log(cartItemIndex)
         if(productQuantity===0){
             cart.items.splice(cartItemIndex,1)
             return await this.cartRepo.save(cart)
@@ -127,7 +127,7 @@ export class CartService {
         }
 
         cart.items[cartItemIndex].quantity=productQuantity;
-        
+
         return await this.cartRepo.save(cart)
         }catch(error){
             throw error;
