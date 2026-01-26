@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/auth/guard';
 import { CartService } from './cart.service';
 import { GetUser } from 'src/auth/decorator';
-import { AddToCartDto, RemoveFromCartDto } from './dto';
+import { AddToCartDto, RemoveFromCartDto, UpdateCartDto } from './dto';
 
 @Controller('cart')
 @ApiTags('Cart')
@@ -24,9 +24,9 @@ export class CartController {
     }
 
     @Patch("/items/:id")
-    updateCart(@GetUser() user: any,@Param('id', ParseIntPipe) productId: number,@Body() body: { productQuantity: number }) 
+    updateCart(@GetUser() user: any,@Param('id', ParseIntPipe) productId: number,@Body()dto:UpdateCartDto) 
     {
-    return this.cartService.updateCart(user, productId, body.productQuantity);
+    return this.cartService.updateCart(user, productId,dto);
 }
      @Delete('/items/:productId')
     RemoveFromCart(@GetUser() user:any,@Param('productId') productId:number){

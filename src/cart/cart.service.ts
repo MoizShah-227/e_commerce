@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Cart, CartStatus } from 'src/entities/cart.entity';
 import { Product } from 'src/entities/product.entity';
 import { Repository, TreeParent } from 'typeorm';
-import { AddToCartDto, RemoveFromCartDto } from './dto';
+import { AddToCartDto, RemoveFromCartDto, UpdateCartDto } from './dto';
 
 @Injectable()
 export class CartService {
@@ -100,20 +100,18 @@ export class CartService {
 
 
 
-        async updateCart(user:any,productId:number,productQuantity:number){
+        async updateCart(user:any,productId:number,dto:UpdateCartDto){
         if(user.role!=="USER") throw new ForbiddenException("Only User can user this");
 
-        if(productQuantity<0) throw new ForbiddenException("Quantity must be greater than 0");
+        if(dto.productQuantity<0) throw new ForbiddenException("Quantity must be greater than 0");
 
         try{
             const cart= await this.cartRepo.findOne({where:{user:{id:user.id},status:CartStatus.ACTIVE}})
         
         if(!cart) throw new NotFoundException("cart Not found")
 
-        console.log(cart.items)
-        const cartItemIndex = cart.items.findIndex((item)=>productId===item.productId)
-        console.log(cartItemIndex)
-        if(productQuantity===0){
+        const cartItemIndex = cart.items.findIndex((item)=>productId===item.ProductId)
+        if(dto.productQuantity===0){
             cart.items.splice(cartItemIndex,1)
             return await this.cartRepo.save(cart)
         }
@@ -122,11 +120,11 @@ export class CartService {
 
         if(!product) throw new NotFoundException("Product Not Found")
         
-        if(productQuantity>product.stockQuantity){
+        if(dto.productQuantity>product.stockQuantity){
             throw new ForbiddenException(`only ${product.stockQuantity} is available`)
         }
 
-        cart.items[cartItemIndex].quantity=productQuantity;
+        cart.items[cartItemIndex].quantity=dto.productQuantity;
 
         return await this.cartRepo.save(cart)
         }catch(error){

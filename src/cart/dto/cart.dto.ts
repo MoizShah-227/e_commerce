@@ -19,3 +19,11 @@ export class RemoveFromCartDto{
         ProductId:number    
 }
 
+export class UpdateCartDto{
+        @ApiProperty({example:1})
+        @IsNumber()
+        @IsNotEmpty()
+        productQuantity:number    
+}
+
+
