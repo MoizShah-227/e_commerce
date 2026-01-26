@@ -1,13 +1,15 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/entities/product.entity';
-import { ILike, Like, Repository } from 'typeorm';
+import { Any, ILike, Like, Repository } from 'typeorm';
 import { AddProductDto, EditProductDto } from './dto';
-
+import { v2 as Cloudinary } from 'cloudinary';
 
 @Injectable()
 export class ProductService {
-    constructor(@InjectRepository(Product) private productRepo:Repository<Product>){}
+    constructor(@InjectRepository(Product) private productRepo:Repository<Product>,
+@Inject('CLOUDINARY') private readonly cloudinary: typeof Cloudinary){}
+
     async getProduct(page:number, limit:number) {
         try {
             const [products, total] = await this.productRepo.findAndCount({
@@ -94,4 +96,19 @@ export class ProductService {
         }
     }
 
+
+    //here we will create the function of uploading image
+    async uploadImage( file:Express.Multer.File){
+        return new Promise<string>((resolve, reject) => {
+        const stream = this.cloudinary.uploader.upload_stream(
+        { folder: 'products' },
+        (error, result) => {
+        if (error) return reject(error);
+        resolve(result?.secure_url||'');
+      },
+    );
+
+    stream.end(file.buffer); // send the buffer
+  });
+    }
 }

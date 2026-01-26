@@ -20,14 +20,15 @@ import { AuthModule } from './auth/auth.module';
           type: 'postgres',
           host: config.get('HOST'),
           port: +config.get('DB_PORT'),
-          username: 'e_commerce_hsa3_user',
+          // username: 'e_commerce_hsa3_user',
+          username: 'postgres',
           password: config.get('PASSWORD'),
           database: config.get('DATABASE'),
           entities: [User, Cart, Product, Order],
           synchronize: true,
-          ssl: { 
-          rejectUnauthorized: false 
-        },
+        //   ssl: { 
+        //   rejectUnauthorized: false 
+        // },
         };
       },
       inject: [ConfigService],

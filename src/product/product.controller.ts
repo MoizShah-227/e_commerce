@@ -1,14 +1,14 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UnsupportedMediaTypeException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Patch, Post, Query, UnsupportedMediaTypeException, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { JwtGuard } from 'src/auth/guard';
-import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/auth/decorator';
 import { AddProductDto, EditProductDto } from './dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Products')
 @ApiBearerAuth()
 @Controller('product')
-
 export class ProductController {
     constructor(private productService:ProductService){}
 
@@ -48,6 +48,28 @@ export class ProductController {
     @Get("/search-product/:name")
     searchProduct(@Param('name') name:string){
         return this.productService.searchProduct(name);
+    }
+
+
+    @Post("/upload")
+    @UseInterceptors(FileInterceptor('file'))
+    @ApiConsumes('multipart/form-data')
+        @ApiBody({
+        description: 'Upload product image',
+        required: true,
+        schema: {
+            type: 'object',
+            properties: {
+            file: {
+                type: 'string',
+                format: 'binary', // Important! Tells Swagger this is a file
+            },
+            },
+        }},)
+        
+    uploadImage(@UploadedFile() file:Express.Multer.File,){
+        // const imageUrl = file.path; // <-- this is the Cloudinary URL
+        return this.productService.uploadImage(file);
     }
 
 }
