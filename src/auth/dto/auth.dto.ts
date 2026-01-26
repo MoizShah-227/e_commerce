@@ -17,7 +17,7 @@ export class RegisterDto{
     @IsNotEmpty()
     password:string
 
-    // @ApiProperty({example:"user"})
+    @ApiProperty({example:"USER", default: "USER"})
     @IsString()
     @IsOptional()
     role:string
