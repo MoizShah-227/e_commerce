@@ -96,7 +96,8 @@ export class OrderService {
     async getAllOrders(userData:any){
         if(userData.role!=="ADMIN") throw new ForbiddenException("Only Admin can Get")
         try{
-            const res = this.orderRepo.find({relations:["user","products"]})
+            const res = await this.orderRepo.find({relations:["user"]})
+            console.log(res)
             return res;
         }catch(error){
         throw error
