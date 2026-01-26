@@ -9,7 +9,6 @@ import { AddProductDto, EditProductDto } from './dto';
 @ApiBearerAuth()
 @Controller('product')
 
-@UseGuards(JwtGuard)
 export class ProductController {
     constructor(private productService:ProductService){}
 
@@ -27,17 +26,20 @@ export class ProductController {
         return this.productService.getProductById(productId)
     }
 
+    @UseGuards(JwtGuard)
     @Post("/admin/add-product")
     addProduct(@GetUser() userData: any ,@Body() dto:AddProductDto){
         return this.productService.addProduct(userData,dto)
     }
     
+    @UseGuards(JwtGuard)
     @Patch("/admin/update-product/:id")
     updateProduct(@GetUser() userData:any,@Param('id',ParseIntPipe) productId:number,@Body() dto:EditProductDto){
         return this.productService.updateProduct(userData,productId,dto)
 
     }
 
+    @UseGuards(JwtGuard)
     @Delete("/admin/delete-product/:id")
     deleteProduct(@GetUser() userData:any,@Param('id',ParseIntPipe) productId:number){
         return this.productService.deleteProduct(userData,productId)
