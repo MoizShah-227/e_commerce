@@ -40,14 +40,15 @@ export class ProductService {
         }
     }
 
-    async addProduct(userData:any,dto:AddProductDto,file:Express.Multer.File){
+    async addProduct(userData:any,dto:AddProductDto,files:Express.Multer.File[]){
         if(userData.role!=="ADMIN") throw new ForbiddenException("Only Admin can add Product")
             const imagesArray:string[]=[];
             
-            try{
-                const imageUrl = await this.uploadImage(file)
+            for(var file of files){
+                const imageUrl=await this.uploadImage(file)
                 imagesArray.push(imageUrl)
-                console.log("imageURL",imagesArray)
+            }
+            try{
                 const res = await this.productRepo.save({
                     name:dto.name,price:dto.price,description:dto.description,category:dto.category,stockQuantity:dto.stockQuantity,images:imagesArray  
                 })

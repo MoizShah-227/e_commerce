@@ -1,10 +1,10 @@
-import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Patch, Post, Query, UnsupportedMediaTypeException, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Patch, Post, Query, UnsupportedMediaTypeException, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { JwtGuard } from 'src/auth/guard';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/auth/decorator';
 import { AddProductDto, EditProductDto } from './dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Products')
 @ApiBearerAuth()
@@ -28,35 +28,40 @@ export class ProductController {
 
     @UseGuards(JwtGuard)
     @Post("/admin/add-product")
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FilesInterceptor('files',6))
+    @ApiConsumes('multipart/form-data')
     @ApiConsumes('multipart/form-data')
     @ApiBody({
-        schema: {
-            type: 'object',
-            properties: {
-            file: {
-                type: 'string',
-                format: 'binary',
+    schema: {
+        type: 'object',
+        properties: {
+        files: {
+            type: 'array',
+            items: {
+            type: 'string',
+            format: 'binary',
             },
-            data: {
-                type: 'string',
-                example: JSON.stringify({
-                name: 'iPhone 15 Pro',
-                description: 'Latest Apple flagship phone',
-                price: 250000,
-                stockQuantity: 12,
-                category: 'Electronics',
-                isActive: true,
-                }),
-            },
-            },
+            description: 'Select multiple images',
         },
-        })
-    addProduct(@GetUser() userData: any , @Body('data') rawJson: string,@UploadedFile() file:Express.Multer.File){
-            // console.log(typeof dto.price, dto.price);
-            // console.log(typeof dto.stockQuantity, dto.stockQuantity);
-              const dto: AddProductDto = JSON.parse(rawJson);
-        return this.productService.addProduct(userData,dto,file)
+        data: {
+            type: 'string',
+            example: JSON.stringify({
+            name: 'iPhone 15 Pro',
+            description: 'Latest Apple flagship phone',
+            price: 250000,
+            stockQuantity: 12,
+            category: 'Electronics',
+            isActive: true,
+            }),
+        },
+        },
+        required: ['files', 'data'],
+    },
+    })
+
+    addProduct(@GetUser() userData: any , @Body('data') rawJson: string,@UploadedFiles() files:Express.Multer.File[]){
+            const dto: AddProductDto = JSON.parse(rawJson);
+            return this.productService.addProduct(userData,dto,files)
     }
     
     @UseGuards(JwtGuard)
