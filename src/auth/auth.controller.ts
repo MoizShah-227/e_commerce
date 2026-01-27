@@ -15,4 +15,9 @@ export class AuthController {
     login(@Body() dto:loginDto){
         return this.authservice.login(dto)
     }
+
+    @Post("/check-email")
+    email(){
+        return this.authservice.email()
+    }
 }

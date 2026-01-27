@@ -9,6 +9,11 @@ import { Product } from './entities/product.entity';
 import { Cart } from './entities/cart.entity';
 import { User } from './entities/user.entity';
 import { AuthModule } from './auth/auth.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { Otp } from './entities/otp.entity';
+import { MailerConfigModule } from './config/mailer.config';
+import { MailService } from './mail/mail.service';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -20,15 +25,11 @@ import { AuthModule } from './auth/auth.module';
           type: 'postgres',
           host: config.get('HOST'),
           port: +config.get('DB_PORT'),
-          username: 'e_commerce_hsa3_user',
-          // username: 'postgres',
+          username: 'postgres',
           password: config.get('PASSWORD'),
           database: config.get('DATABASE'),
-          entities: [User, Cart, Product, Order],
+          entities: [User, Cart, Product, Order, Otp],
           synchronize: true,
-          ssl: { 
-          rejectUnauthorized: false 
-        },
         };
       },
       inject: [ConfigService],
@@ -37,8 +38,9 @@ import { AuthModule } from './auth/auth.module';
     ProductModule,
     OrderModule,
     CartModule,
+    MailerConfigModule,
+    MailModule
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}
+

@@ -7,6 +7,7 @@ import { User } from 'src/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { loginDto, RegisterDto } from './dto';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +15,8 @@ export class AuthService {
     private jwt:JwtService,
     private config: ConfigService,
     @InjectRepository(User)
-    private userRepo: Repository<User>,) {}
+    private userRepo: Repository<User>,
+    private readonly mailService: MailService,) {}
     
     async register(dto:RegisterDto){
         const hash = await argon.hash(dto.password);
@@ -58,5 +60,9 @@ export class AuthService {
 
         return {access_token:"Bearer "+token,}
 
+    }
+
+    async email(){
+        await this.mailService.sendEmail("syedmoizhassan123@gmail.com","testing","testing")
     }
 }

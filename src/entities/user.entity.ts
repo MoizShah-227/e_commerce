@@ -1,7 +1,8 @@
 // users.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, OneToOne } from 'typeorm';
 import { Cart } from './cart.entity';
 import { Order } from "./order.entity";
+import { Otp } from './otp.entity';
 
 export enum UserRole {
   USER = 'USER',
@@ -29,7 +30,10 @@ export class User {
   })
   role: UserRole;
 
+  @Column({default:false})
+  status:boolean
   @CreateDateColumn()
+  
   createdAt: Date;
 
   @OneToMany(() => Cart, cart => cart.user)
@@ -37,4 +41,7 @@ export class User {
 
   @OneToMany(() => Order, order => order.user)
   orders: Order[];
+  
+  @OneToOne(() => Otp, otp => otp.user)
+  otp: Otp;
 }
