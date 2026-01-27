@@ -15,19 +15,19 @@ export class ProductController {
     @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
     @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
     
-    @Get("/get-products")
+    @Get("/products")
     getProduct( @Query('page') page,@Query('limit') limit){
     return this.productService.getProduct(Number(page), Number(limit));
     }
     
-    @Get("/get-product/:id")
+    @Get("/product/:id")
     // @ApiParam({ name: 'id', type: Number })
     getProductById(@Param('id',ParseIntPipe) productId:number){
         return this.productService.getProductById(productId)
     }
 
     @UseGuards(JwtGuard)
-    @Post("/admin/add-product")
+    @Post("/admin/product")
     @UseInterceptors(FilesInterceptor('files',6))
     @ApiConsumes('multipart/form-data')
     @ApiConsumes('multipart/form-data')
@@ -65,14 +65,14 @@ export class ProductController {
     }
     
     @UseGuards(JwtGuard)
-    @Patch("/admin/update-product/:id")
+    @Patch("/admin/product/:id")
     updateProduct(@GetUser() userData:any,@Param('id',ParseIntPipe) productId:number,@Body() dto:EditProductDto){
         return this.productService.updateProduct(userData,productId,dto)
 
     }
 
     @UseGuards(JwtGuard)
-    @Delete("/admin/delete-product/:id")
+    @Delete("/admin/product/:id")
     deleteProduct(@GetUser() userData:any,@Param('id',ParseIntPipe) productId:number){
         return this.productService.deleteProduct(userData,productId)
     }
@@ -83,24 +83,6 @@ export class ProductController {
     }
 
 
-    // @Post("/upload")
-    // @UseInterceptors(FileInterceptor('file'))
-    // @ApiConsumes('multipart/form-data')
-    //     @ApiBody({
-    //     description: 'Upload product image',
-    //     required: true,
-    //     schema: {
-    //         type: 'object',
-    //         properties: {
-    //         file: {
-    //             type: 'string',
-    //             format: 'binary', // Important! Tells Swagger this is a file
-    //         },
-    //         },
-    //     }},)
-        
-    // uploadImage(@UploadedFile() file:Express.Multer.File,){
-    //     return this.productService.uploadImage(file);
-    // }
+    
 
 }
