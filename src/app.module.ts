@@ -26,9 +26,9 @@ import { AuthModule } from './auth/auth.module';
           database: config.get('DATABASE'),
           entities: [User, Cart, Product, Order],
           synchronize: true,
-        //   ssl: { 
-        //   rejectUnauthorized: false 
-        // },
+          ssl: { 
+          rejectUnauthorized: false 
+        },
         };
       },
       inject: [ConfigService],
