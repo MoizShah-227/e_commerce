@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, Min } from 'class-validator';
 
 export class AddProductDto {
@@ -47,13 +48,11 @@ export class EditProductDto {
 
   @ApiPropertyOptional({ example: 999.99 })
   @IsNumber()
-  @Min(0)
   @IsOptional()
   price?: number;
 
   @ApiPropertyOptional({ example: 10 })
   @IsNumber()
-  @Min(0)
   @IsOptional()
   stockQuantity?: number;
 

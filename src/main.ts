@@ -8,7 +8,7 @@ async function bootstrap() {
   const config=  new DocumentBuilder().setTitle("E_Commerce").setDescription("API Testing").addBearerAuth().setVersion('1.0').build()
   
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true,whitelist: true,}));
   const configService = app.get(ConfigService);
 
   const docoment = SwaggerModule.createDocument(app,config);

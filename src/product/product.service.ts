@@ -40,10 +40,17 @@ export class ProductService {
         }
     }
 
-    async addProduct(userData:any,dto:AddProductDto){
+    async addProduct(userData:any,dto:AddProductDto,file:Express.Multer.File){
         if(userData.role!=="ADMIN") throw new ForbiddenException("Only Admin can add Product")
+            const imagesArray:string[]=[];
+            
             try{
-                const res = await this.productRepo.save(dto)
+                const imageUrl = await this.uploadImage(file)
+                imagesArray.push(imageUrl)
+                console.log("imageURL",imagesArray)
+                const res = await this.productRepo.save({
+                    name:dto.name,price:dto.price,description:dto.description,category:dto.category,stockQuantity:dto.stockQuantity,images:imagesArray  
+                })
                 return res;
             }catch(error){
                 throw error
@@ -98,7 +105,7 @@ export class ProductService {
 
 
     //here we will create the function of uploading image
-    async uploadImage( file:Express.Multer.File){
+    uploadImage( file:Express.Multer.File){
         return new Promise<string>((resolve, reject) => {
         const stream = this.cloudinary.uploader.upload_stream(
         { folder: 'products' },
@@ -107,8 +114,7 @@ export class ProductService {
         resolve(result?.secure_url||'');
       },
     );
-
     stream.end(file.buffer); // send the buffer
   });
-    }
+}
 }

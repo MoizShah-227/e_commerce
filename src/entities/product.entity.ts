@@ -20,6 +20,8 @@ export class Product {
   @Column()
   category: string;
 
+  @Column("text",{array:true,nullable:true})
+  images: string[]
   
   @Column({ default: true })
   isActive: boolean;

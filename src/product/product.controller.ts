@@ -28,8 +28,35 @@ export class ProductController {
 
     @UseGuards(JwtGuard)
     @Post("/admin/add-product")
-    addProduct(@GetUser() userData: any ,@Body() dto:AddProductDto){
-        return this.productService.addProduct(userData,dto)
+    @UseInterceptors(FileInterceptor('file'))
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+            file: {
+                type: 'string',
+                format: 'binary',
+            },
+            data: {
+                type: 'string',
+                example: JSON.stringify({
+                name: 'iPhone 15 Pro',
+                description: 'Latest Apple flagship phone',
+                price: 250000,
+                stockQuantity: 12,
+                category: 'Electronics',
+                isActive: true,
+                }),
+            },
+            },
+        },
+        })
+    addProduct(@GetUser() userData: any , @Body('data') rawJson: string,@UploadedFile() file:Express.Multer.File){
+            // console.log(typeof dto.price, dto.price);
+            // console.log(typeof dto.stockQuantity, dto.stockQuantity);
+              const dto: AddProductDto = JSON.parse(rawJson);
+        return this.productService.addProduct(userData,dto,file)
     }
     
     @UseGuards(JwtGuard)
@@ -51,25 +78,24 @@ export class ProductController {
     }
 
 
-    @Post("/upload")
-    @UseInterceptors(FileInterceptor('file'))
-    @ApiConsumes('multipart/form-data')
-        @ApiBody({
-        description: 'Upload product image',
-        required: true,
-        schema: {
-            type: 'object',
-            properties: {
-            file: {
-                type: 'string',
-                format: 'binary', // Important! Tells Swagger this is a file
-            },
-            },
-        }},)
+    // @Post("/upload")
+    // @UseInterceptors(FileInterceptor('file'))
+    // @ApiConsumes('multipart/form-data')
+    //     @ApiBody({
+    //     description: 'Upload product image',
+    //     required: true,
+    //     schema: {
+    //         type: 'object',
+    //         properties: {
+    //         file: {
+    //             type: 'string',
+    //             format: 'binary', // Important! Tells Swagger this is a file
+    //         },
+    //         },
+    //     }},)
         
-    uploadImage(@UploadedFile() file:Express.Multer.File,){
-        // const imageUrl = file.path; // <-- this is the Cloudinary URL
-        return this.productService.uploadImage(file);
-    }
+    // uploadImage(@UploadedFile() file:Express.Multer.File,){
+    //     return this.productService.uploadImage(file);
+    // }
 
 }
