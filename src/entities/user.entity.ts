@@ -1,4 +1,4 @@
-// users.entity.ts
+// user.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, OneToOne } from 'typeorm';
 import { Cart } from './cart.entity';
 import { Order } from "./order.entity";
@@ -30,10 +30,10 @@ export class User {
   })
   role: UserRole;
 
-  @Column({default:false})
-  status:boolean
+  @Column({ default: false })
+  status: boolean;
+
   @CreateDateColumn()
-  
   createdAt: Date;
 
   @OneToMany(() => Cart, cart => cart.user)
