@@ -27,4 +27,16 @@ export class MailService {
       },
     });
   }
+
+  async sendOrderStatus(email: string, name: string,status:string) {
+    const template = status=="CONFIRMED"?"orderConfirmed":"orderCancelled"
+    return this.mailerService.sendMail({
+      to:email,
+      subject:"Order Status",
+      template:template,
+      context:{
+        customerName:name,
+      },
+    });
+  }
 }

@@ -24,9 +24,4 @@ export class AuthController {
     async reSendOtp(@Body() dto: ReSendOtp) {
         return this.authservice.reSendOtp(dto)
     }
-    @Post('check')
-    async welcome() {
-        return this.authservice.email() 
-    }
-
 }

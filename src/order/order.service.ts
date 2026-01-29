@@ -6,12 +6,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from 'src/entities/order.entity';
 import { Cart, CartStatus } from 'src/entities/cart.entity';
 import { DataSource } from 'typeorm';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class OrderService {
     constructor(@InjectRepository(Product) private productRepo:Repository<Product>,
         @InjectRepository(Order) private orderRepo:Repository<Order>,
-        @InjectRepository(Cart) private cartRepo:Repository<Cart>,private dataSource:DataSource){}
+        @InjectRepository(Cart) private cartRepo:Repository<Cart>,private dataSource:DataSource,
+        private readonly mailService: MailService,){}
     
     async placeOrder(user: any) {
         if (user.role !== "USER") {
@@ -122,7 +124,9 @@ export class OrderService {
         if(userData.role!=="ADMIN") throw new ForbiddenException("Only Admin can Get")
         try{
                 const res = await this.orderRepo.update({id:orderId},{status:dto.status})
+                const order = await this.orderRepo.findOne({where:{id:orderId},relations:['user']})
                 if(res.affected===0) throw new NotFoundException("Order not Found") 
+                await this.mailService.sendOrderStatus(order?.user.email||'',order?.user.name||'',dto.status)
                 return res;
         }
         catch(error){

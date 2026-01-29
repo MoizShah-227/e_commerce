@@ -59,17 +59,17 @@ export class AuthService {
             
             if(!user.status) throw new ForbiddenException("Please verify your Account");
             
-            return this.signToken(user.id,user.email);
+            return this.signToken(user.id,user.email,user.name);
         }catch(error){
             throw error;
         }
     }
 
 
-     async signToken(userId:number,email:string):Promise<{access_token:string}>{
+     async signToken(userId:number,email:string,name:string):Promise<{access_token:string}>{
         const payload ={
             sub:userId,
-            email
+            email,name
         }
         const secret =this.config.get('JWT_KEY')
         const token =  await this.jwt.signAsync(payload,{
@@ -118,7 +118,7 @@ export class AuthService {
 
                 return {
                     message: 'Email verified successfully',
-                    token: await this.signToken(user.id, user.email), // If you want auto-login
+                    token: await this.signToken(user.id, user.email,user.name), // If you want auto-login
                     user: {
                         id: user.id,
                         email: user.email,
@@ -151,10 +151,6 @@ export class AuthService {
     }
 
     
-    async email(){
-        await this.mailService.sendWelcomeEmail("glidexsol@gmail.com","testing")
-    }
-
     createOtpCode(){
       return Math.floor(100000 + Math.random() * 900000);
     }

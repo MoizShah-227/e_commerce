@@ -6,11 +6,12 @@ import { AuthModule } from 'src/auth/auth.module';
 import { OrderController } from './order.controller';
 import { Product } from 'src/entities/product.entity';
 import { Cart } from 'src/entities/cart.entity';
+import { MailService } from 'src/mail/mail.service';
 
 @Module({
   imports:[TypeOrmModule.forFeature([Order,Product,Cart]),AuthModule],
   controllers:[OrderController],
-  providers: [OrderService]
+  providers: [OrderService,MailService]
 
 })
 export class OrderModule {}
