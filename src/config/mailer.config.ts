@@ -12,10 +12,8 @@ import { join } from 'path';
         return {
           transport: {
             host: config.get('E_HOST'),
-            // port: 587,  
-            port: 465,  
-            // secure: false,
-            secure: true,
+            port: 587,  
+            secure: false,
             auth: {
               user: config.get('E_USER'),
               pass: config.get('E_PASS'),
