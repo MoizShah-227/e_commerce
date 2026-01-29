@@ -1,12 +1,12 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConsoleLogger, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 // import { user } from 'srentities/cart.entity';
-import { Repository } from 'typeorm';
+import { Any, Repository } from 'typeorm';
 import * as argon from 'argon2'
 import { User } from 'src/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { loginDto, RegisterDto, VerifyOtpDto } from './dto';
+import { loginDto, RegisterDto, ReSendOtp, VerifyOtpDto } from './dto';
 import { MailService } from 'src/mail/mail.service';
 import { Otp } from 'src/entities/otp.entity';
 
@@ -24,7 +24,8 @@ export class AuthService {
     async register(dto:RegisterDto){
         const hash = await argon.hash(dto.password);
         const otpCode = this.createOtpCode()
-        this.mailService.sendOtpEmail(dto.email,dto.name,otpCode)
+
+        await this.mailService.sendOtpEmail(dto.email,dto.name,otpCode)
         try{   
             const res = await this.userRepo.save({
                 name:dto.name,
@@ -34,6 +35,7 @@ export class AuthService {
             
             const saveOtp =await this.otpRepo.save({
                 otp:otpCode,
+                createdAt: new Date(),
                 user:{id:res.id}
             })
             return  {
@@ -50,13 +52,13 @@ export class AuthService {
 
     async login(dto:loginDto){
         try{
-
             const user= await this.userRepo.findOneBy({email:dto.email})
-            if(!user) throw new ForbiddenException("Invalid Credentials")
+            if(!user) throw new UnauthorizedException("Invalid Credentials")
             const pwmatch = await argon.verify(user.Hash,dto.password)
-            if(!pwmatch) throw new ForbiddenException("Invalid Password");
+            if(!pwmatch) throw new UnauthorizedException("Invalid Password");
             
             if(!user.status) throw new ForbiddenException("Please verify your Account");
+            
             return this.signToken(user.id,user.email);
         }catch(error){
             throw error;
@@ -101,17 +103,17 @@ export class AuthService {
                 if (user.otp.otp !== dto.otp) {
                     throw new BadRequestException('Invalid OTP');
                 }
-
-                const otpAge = Date.now() - user.otp.createdAt.getTime();
-                const fiveMinutes = 5 * 60 * 1000;
+                const createdAt = new Date(user.otp.createdAt)
                 
-                if (otpAge > fiveMinutes) {
+                const otpAge = Date.now() - createdAt.getTime()
+                const twoMinutes = 2 * 60 * 1000;
+                if (otpAge > twoMinutes) {
                     throw new BadRequestException('OTP has expired. Please request a new one.');
                 }
 
                 user.status = true;
                 await this.userRepo.save(user);
-
+                await this.mailService.sendWelcomeEmail(user.email,user.name)
                 await this.otpRepo.remove(user.otp);
 
                 return {
@@ -128,9 +130,29 @@ export class AuthService {
                 throw error;
             }
         }
+    
+    async reSendOtp(dto: ReSendOtp) {
+        try{
+            const user = await this.userRepo.findOne({where:{email:dto.email}})
+            if(!user) throw new NotFoundException("user not found")
+            if(user.status) throw new ForbiddenException("user is already verified")
+            
+            const otpCode = this.createOtpCode()
+            await this.mailService.sendOtpEmail(user.email,user.name,otpCode)
 
+            const res = await this.otpRepo.update({user:{id:user.id}},
+                {otp:otpCode,
+                createdAt: new Date(),}
+            )
+            return {message:"Check you mail"}
+        }catch(error){
+            throw error
+        }
+    }
+
+    
     async email(){
-        await this.mailService.sendOtpEmail("glidexsol@gmail.com","testing",123667)
+        await this.mailService.sendWelcomeEmail("glidexsol@gmail.com","testing")
     }
 
     createOtpCode(){

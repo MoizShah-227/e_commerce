@@ -55,3 +55,9 @@ export class VerifyOtpDto {
   @IsNotEmpty()
   otp: number;
 }
+export class ReSendOtp {
+    @ApiProperty({example:"glidexsol@gmail.com"})
+    @IsEmail()
+    @IsNotEmpty()
+    email:string
+}
