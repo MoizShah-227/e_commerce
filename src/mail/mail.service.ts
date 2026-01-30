@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 export class MailService {
     constructor(private readonly mailerService: MailerService) {}
 
-  async sendOtpEmail(email: string, name: string, otp: number) {
+  sendOtpEmail(email: string, name: string, otp: number) {
     return this.mailerService.sendMail({
       to:email,
       subject:"Your OTP Code",
@@ -17,7 +17,7 @@ export class MailService {
     });
   }
 
-  async sendWelcomeEmail(email: string, name: string) {
+   sendWelcomeEmail(email: string, name: string) {
     return this.mailerService.sendMail({
       to:email,
       subject:"Welcome",

@@ -61,3 +61,10 @@ export class ReSendOtp {
     @IsNotEmpty()
     email:string
 }
+export class VerifyCaptchaDto {
+  @ApiProperty({
+    example: '03AFcWeA6...',
+    description: 'Google reCAPTCHA token',
+  })
+  token: string;
+}

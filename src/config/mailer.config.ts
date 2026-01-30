@@ -21,12 +21,12 @@ import { join } from 'path';
             tls: {
               rejectUnauthorized: false,
             },
-            connectionTimeout: 20000,
-            greetingTimeout: 20000,
-            socketTimeout: 20000,
-            pool: true,
-            maxConnections: 5,
-            maxMessages: 100,
+            // connectionTimeout: 20000,
+            // greetingTimeout: 20000,
+            // socketTimeout: 20000,
+            // pool: true,
+            // maxConnections: 5,
+            // maxMessages: 100,
           },
           template: {
            dir: join(__dirname, '..', 'mail', 'templates'),

@@ -14,6 +14,7 @@ import { Otp } from './entities/otp.entity';
 import { MailerConfigModule } from './config/mailer.config';
 import { MailService } from './mail/mail.service';
 import { MailModule } from './mail/mail.module';
+import { CaptchaModule } from './captcha/captcha.module';
 
 @Module({
   imports: [
@@ -25,15 +26,18 @@ import { MailModule } from './mail/mail.module';
           type: 'postgres',
           host: config.get('HOST'),
           port: +config.get('DB_PORT'),
-          username: 'postgres',
-          // username: 'e_commerce_hsa3_user',
+          // username: 'postgres',
+          username: 'e_commerce_hsa3_user',
           password: config.get('PASSWORD'),
           database: config.get('DATABASE'),
           entities: [User, Cart, Product, Order, Otp],
           synchronize: true,
-          // ssl: { 
-          // rejectUnauthorized: false 
-          // },
+          ssl: { 
+          rejectUnauthorized: false 
+          },
+          extra: {
+        keepAlive: true,                  // maintain connection
+        },
         };
       },
       inject: [ConfigService],
@@ -43,7 +47,8 @@ import { MailModule } from './mail/mail.module';
     OrderModule,
     CartModule,
     MailerConfigModule,
-    MailModule
+    MailModule,
+    CaptchaModule
   ],
 })
 export class AppModule {}
