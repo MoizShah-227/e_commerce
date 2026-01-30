@@ -63,8 +63,7 @@ export class ReSendOtp {
 }
 export class VerifyCaptchaDto {
   @ApiProperty({
-    example: '03AFcWeA6...',
-    description: 'Google reCAPTCHA token',
-  })
-  token: string;
+    example: '03AFcWeA6...',})
+    @IsNotEmpty()
+    token: string;
 }

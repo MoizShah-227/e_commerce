@@ -14,7 +14,6 @@ import { Otp } from './entities/otp.entity';
 import { MailerConfigModule } from './config/mailer.config';
 import { MailService } from './mail/mail.service';
 import { MailModule } from './mail/mail.module';
-import { CaptchaModule } from './captcha/captcha.module';
 
 @Module({
   imports: [
@@ -50,7 +49,6 @@ import { CaptchaModule } from './captcha/captcha.module';
     CartModule,
     MailerConfigModule,
     MailModule,
-    CaptchaModule
   ],
 })
 export class AppModule {}
