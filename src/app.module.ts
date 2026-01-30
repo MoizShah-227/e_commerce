@@ -25,7 +25,7 @@ import { CaptchaModule } from './captcha/captcha.module';
         return {
           type: 'postgres',
           host: config.get('HOST'),
-          port: +config.get('DB_PORT'),
+          port: config.get('DB_PORT'),
           // username: 'postgres',
           username: 'e_commerce_hsa3_user',
           password: config.get('PASSWORD'),
@@ -33,11 +33,13 @@ import { CaptchaModule } from './captcha/captcha.module';
           entities: [User, Cart, Product, Order, Otp],
           synchronize: true,
           ssl: { 
-          rejectUnauthorized: false 
+          rejectUnauthorized: false
           },
           extra: {
-        keepAlive: true,                  // maintain connection
-        },
+          max: 10, // max pool connections
+          idleTimeoutMillis: 30000, // close idle connections after 30s
+          },
+        logging: ['error'],
         };
       },
       inject: [ConfigService],
