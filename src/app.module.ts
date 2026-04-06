@@ -26,7 +26,7 @@ import { MailModule } from './mail/mail.module';
           host: config.get('HOST'),
           port: config.get('DB_PORT'),
           // username: 'postgres',
-          username: 'e_commerce_hsa3_user',
+          username: 'e_commerce_edme_user',
           password: config.get('PASSWORD'),
           database: config.get('DATABASE'),
           entities: [User, Cart, Product, Order, Otp],
