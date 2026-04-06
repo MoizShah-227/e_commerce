@@ -2,7 +2,6 @@ import { BadRequestException, ConsoleLogger, ForbiddenException, Injectable, Not
 import { InjectRepository } from '@nestjs/typeorm';
 // import { user } from 'srentities/cart.entity';
 import { Any, Repository } from 'typeorm';
-import * as argon from 'argon2'
 import { User } from 'src/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -22,7 +21,6 @@ export class AuthService {
     private readonly mailService: MailService,) {}
     
     async register(dto:RegisterDto){
-        const hash = await argon.hash(dto.password);
         const otpCode = this.createOtpCode()
 
         await this.mailService.sendOtpEmail(dto.email,dto.name,otpCode)
@@ -30,7 +28,7 @@ export class AuthService {
             const res = await this.userRepo.save({
                 name:dto.name,
                 email:dto.email,
-                Hash:hash,
+                Hash:dto.password,
             })
             
             const saveOtp =await this.otpRepo.save({
@@ -54,8 +52,9 @@ export class AuthService {
         try{
             const user= await this.userRepo.findOneBy({email:dto.email})
             if(!user) throw new UnauthorizedException("Invalid Credentials")
-            const pwmatch = await argon.verify(user.Hash,dto.password)
-            if(!pwmatch) throw new UnauthorizedException("Invalid Password");
+            if (user.Hash !== dto.password) {
+                throw new UnauthorizedException("Invalid Password");
+            }
             
             if(!user.status) throw new ForbiddenException("Please verify your Account");
             
