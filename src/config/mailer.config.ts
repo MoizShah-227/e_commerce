@@ -8,7 +8,8 @@ import { join } from 'path';
     ConfigModule.forRoot({ isGlobal: true }),
     MailerModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (config: ConfigService) => {
+      
+      useFactory: async (config:ConfigService) => {
         return {
           transport: {
             host: config.get('E_HOST'),
